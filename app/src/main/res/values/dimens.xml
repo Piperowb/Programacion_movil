@@ -1,5 +1,0 @@
-<resources>
-      <dimen name="fab_margin">16dp</dimen>
-      <dimen name="texto_botones">28sp</dimen>
-      <dimen name="altura_botones">80dp</dimen>
-   </resources>
