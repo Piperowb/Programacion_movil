@@ -29,7 +29,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController telefonoController = TextEditingController();
 
   Future<void> enviarSolicitudPost() async {
-    final url = Uri.parse('http://192.168.1.3/webService/insertarUsuario.php'); // Reemplaza con la URL correcta
+    final url = Uri.parse('http://192.168.1.3/webService/insertarUsuario.php');
 
     final response = await http.post(
       url,
@@ -43,16 +43,13 @@ class _MyHomePageState extends State<MyHomePage> {
     );
 
     if (response.statusCode == 200) {
-      // La solicitud se realizó con éxito
       final responseData = response.body;
-      print(responseData); // Puedes procesar la respuesta aquí
+      print(responseData); 
       mostrarAlerta("Registro exitoso");
       limpiarCampos();
 
-      // Redirige a la pantalla de inicio de sesión
       Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginScreen()));
     } else {
-      // Hubo un error en la solicitud
       print('Error: ${response.statusCode}');
       print('Mensaje de error: ${response.body}');
       mostrarAlerta("Error al enviar los datos");
@@ -122,26 +119,26 @@ class _MyHomePageState extends State<MyHomePage> {
                 controller: nombreController,
                 decoration: InputDecoration(
                   labelText: 'Nombre',
-                  prefixIcon: Icon(Icons.person, color: Colors.white), // Color del ícono
-                  labelStyle: TextStyle(color: Colors.white), // Color de la etiqueta
+                  prefixIcon: Icon(Icons.person, color: Colors.white),
+                  labelStyle: TextStyle(color: Colors.white), 
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white), // Bordes blancos al enfocar
+                    borderSide: BorderSide(color: Colors.white),
                   ),
                 ),
-                style: TextStyle(color: Colors.white), // Color del texto del campo
+                style: TextStyle(color: Colors.white), 
               ),
               SizedBox(height: 16),
               TextFormField(
                 controller: correoController,
                 decoration: InputDecoration(
                   labelText: 'Correo',
-                  prefixIcon: Icon(Icons.email, color: Colors.white), // Color del ícono
-                  labelStyle: TextStyle(color: Colors.white), // Color de la etiqueta
+                  prefixIcon: Icon(Icons.email, color: Colors.white), 
+                  labelStyle: TextStyle(color: Colors.white), 
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white), // Bordes blancos al enfocar
+                    borderSide: BorderSide(color: Colors.white), 
                   ),
                 ),
-                style: TextStyle(color: Colors.white), // Color del texto del campo
+                style: TextStyle(color: Colors.white), 
                 keyboardType: TextInputType.emailAddress,
               ),
               SizedBox(height: 16),
@@ -149,13 +146,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 controller: contrasenaController,
                 decoration: InputDecoration(
                   labelText: 'Contraseña',
-                  prefixIcon: Icon(Icons.lock, color: Colors.white), // Color del ícono
-                  labelStyle: TextStyle(color: Colors.white), // Color de la etiqueta
+                  prefixIcon: Icon(Icons.lock, color: Colors.white), 
+                  labelStyle: TextStyle(color: Colors.white), 
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white), // Bordes blancos al enfocar
+                    borderSide: BorderSide(color: Colors.white), 
                   ),
                 ),
-                style: TextStyle(color: Colors.white), // Color del texto del campo
+                style: TextStyle(color: Colors.white), 
                 obscureText: true,
               ),
               SizedBox(height: 16),
@@ -163,26 +160,26 @@ class _MyHomePageState extends State<MyHomePage> {
                 controller: direccionController,
                 decoration: InputDecoration(
                   labelText: 'Dirección',
-                  prefixIcon: Icon(Icons.location_on, color: Colors.white), // Color del ícono
-                  labelStyle: TextStyle(color: Colors.white), // Color de la etiqueta
+                  prefixIcon: Icon(Icons.location_on, color: Colors.white), 
+                  labelStyle: TextStyle(color: Colors.white), 
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white), // Bordes blancos al enfocar
+                    borderSide: BorderSide(color: Colors.white), 
                   ),
                 ),
-                style: TextStyle(color: Colors.white), // Color del texto del campo
+                style: TextStyle(color: Colors.white), 
               ),
               SizedBox(height: 16),
               TextFormField(
                 controller: telefonoController,
                 decoration: InputDecoration(
                   labelText: 'Teléfono',
-                  prefixIcon: Icon(Icons.phone, color: Colors.white), // Color del ícono
-                  labelStyle: TextStyle(color: Colors.white), // Color de la etiqueta
+                  prefixIcon: Icon(Icons.phone, color: Colors.white), 
+                  labelStyle: TextStyle(color: Colors.white), 
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white), // Bordes blancos al enfocar
+                    borderSide: BorderSide(color: Colors.white), 
                   ),
                 ),
-                style: TextStyle(color: Colors.white), // Color del texto del campo
+                style: TextStyle(color: Colors.white), 
                 keyboardType: TextInputType.phone,
               ),
               SizedBox(height: 24),

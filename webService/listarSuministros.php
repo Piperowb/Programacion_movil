@@ -8,16 +8,19 @@ class EjemploPost {
         
     }
 
-    function consultarUsuario() {
+    function listarSuministros() {
         try {
             // Comprobar si la solicitud es POST
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Obtener los datos enviados en la solicitud POST
-                $correo = $_POST['correo'];
-                $contraseña = $_POST['contraseña'];
                 
                 $crud = new crud();
-                $sql = "SELECT * FROM usuario WHERE correo = '$correo' AND contraseña = '$contraseña'";
+                $sql = "SELECT lista_suministros.id, tipo_desastre.id AS id_tipo_desastre, 
+                        tipo_desastre.nombre, tipo_desastre.descripcion, tipo_desastre.ubicacion, 
+                        lista_suministros.suministro, lista_suministros.descripcion AS descripcion_suministro
+                        FROM lista_suministros
+                        INNER JOIN tipo_desastre ON lista_suministros.id_tipo_desastre = tipo_desastre.id ORDER BY id DESC;
+                ";
                 
                 $response = $crud ->consultar($sql);
                 
@@ -50,4 +53,4 @@ class EjemploPost {
 $ejemploPost = new EjemploPost();
 
 // Llamar a la función 'insertarUsuario' para manejar la solicitud POST
-$ejemploPost->consultarUsuario();
+$ejemploPost->listarSuministros();

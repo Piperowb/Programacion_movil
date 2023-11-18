@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'login_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'shelter.dart';
+import 'alerts.dart';
+import 'type_disaster.dart';
+import 'supply_list.dart';
 
 void main() {
   runApp(HomeScreen());
@@ -27,9 +33,101 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  TextEditingController sugerenciasController = TextEditingController();
+  List<Alert> alerts = []; // Lista para almacenar las alertas
+
+  @override
+  void initState() {
+    super.initState();
+    // Llama a la función para cargar las alertas al inicio
+    listarAlertas();
+  }
+
   void irALogin() {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginScreen()));
   }
+
+  Future<void> listarAlertas() async {
+    final url = Uri.parse('http://192.168.1.3/webService/listarUltimaAlerta.php');
+
+    final response = await http.post(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+
+      setState(() {
+        // Mapea los datos obtenidos a la lista de objetos Alert
+        alerts = data.map((item) => Alert(
+          id: int.parse(item['id']),
+          mensaje: item['mensaje'],
+          nombre: item['nombre'],
+          ubicacion: item['ubicacion'],
+          fecha: item['fecha'],
+        )).toList();
+      });
+    } else {
+      mostrarAlerta("Error al listar alertas");
+    }
+  }
+
+
+  Future<void> mostrarConfirmacionCerrarSesion() async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Cerrar Sesión', style: TextStyle(fontWeight: FontWeight.bold)),
+          content: Text('¿Está seguro de que desea cerrar sesión?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancelar', style: TextStyle(color: Colors.black)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(primary: Colors.red[900]),
+              child: Text('Confirmar', style: TextStyle(color: Colors.white)),
+              onPressed: () {
+                Navigator.of(context).pop();
+                cerrarSesion();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void cerrarSesion() {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginScreen()));
+  }
+
+  void mostrarAlerta(String mensaje) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Mensaje', style: TextStyle(fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(mensaje, style: TextStyle(fontSize: 16)),
+              SizedBox(height: 16),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(primary: Colors.red[900]),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK', style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +139,7 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: [
           IconButton(
             icon: Icon(Icons.exit_to_app, color: Colors.white),
-            onPressed: irALogin,
+            onPressed: mostrarConfirmacionCerrarSesion,
           ),
         ],
       ),
@@ -54,27 +152,42 @@ class _MyHomePageState extends State<MyHomePage> {
                 Expanded(
                   child: TextField(
                     decoration: InputDecoration(
-                      hintText: "Buscar alertas",
+                      hintText: "Buscar noticias recientes",
                       hintStyle: TextStyle(color: Colors.white),
                     ),
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
-                Icon(Icons.person, color: Colors.white),
+                Icon(Icons.search, color: Colors.white),
               ],
             ),
           ),
+          for (var alert in alerts)
+            SectionCard(
+              title: "Últimos movimientos",
+              data: "Tipo de desastre: ${alert.nombre}\nUbicación: ${alert.ubicacion}\nFecha: ${alert.fecha}",
+            ),
           SectionCard(
-            title: "Últimos movimientos",
-            data: "Sismo 4.6\nValle del Cauca\n25 Ago, 10 am",
-          ),
-          SectionCard(
-            title: "Pronósticos y alertas",
-            data: "Estado: Tranquilo\n---\n---",
+            title: "Pronóstico",
+            data: "Estado: Tranquilo",
           ),
           SectionCard(
             title: "Sugerencias en pronóstico",
-            data: "Tus sugerencias aquí",
+            data: TextField(
+              controller: sugerenciasController,
+              maxLines: null,
+              decoration: InputDecoration(
+                hintText: 'Ingresa tus sugerencias aquí',
+                hintStyle: TextStyle(color: Colors.white),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white),
+                ),
+              ),
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -86,13 +199,41 @@ class _MyHomePageState extends State<MyHomePage> {
             IconButton(
               icon: Icon(Icons.notifications, color: Colors.white),
               onPressed: () {
-                // Acción para mostrar notificaciones
+                Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => AlertScreen(),
+                  ),
+                );
               },
             ),
             IconButton(
-              icon: Icon(Icons.location_on, color: Colors.white),
+              icon: Icon(Icons.flash_on, color: Colors.white),
               onPressed: () {
-                // Acción para mostrar notificaciones
+                Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => TypeDisasterScreen(),
+                  ),
+                );
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.dashboard, color: Colors.white),
+              onPressed: () {
+                Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => ShelterScreen(),
+                  ),
+                );
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.view_list, color: Colors.white),
+              onPressed: () {
+                Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => SupplyListScreen(),
+                  ),
+                );
               },
             ),
           ],
@@ -102,15 +243,32 @@ class _MyHomePageState extends State<MyHomePage> {
         child: ListView(
           children: <Widget>[
             UserAccountsDrawerHeader(
-              accountName: Text("Usuario"),
-              accountEmail: Text("usuario@correo.com"), //Traer de la base de datos una vez logueado
+              accountName: Text("Felipe Rodriguez"),
+              accountEmail: Text("felipero@gmail.com"),
               currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.black, // Fondo negro
-                child: Icon(Icons.person, size: 50, color: Colors.white), // Icono de color blanco
+                backgroundColor: Colors.black,
+                child: Icon(Icons.person, size: 50, color: Colors.white),
               ),
               decoration: BoxDecoration(
                 color: Colors.red[900],
               ),
+            ),
+            ListTile(
+              leading: Icon(Icons.home, color: Colors.red[900]),
+              title: Text(
+                'Inicio',
+                style: TextStyle(
+                  color: Colors.red[900],
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onTap: () {
+                Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => HomeScreen(),
+                  ),
+                );
+              },
             ),
             ListTile(
               leading: Icon(Icons.dashboard, color: Colors.red[900]),
@@ -122,8 +280,66 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               onTap: () {
-                // Acción para tablero
-                Navigator.pop(context);
+                Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => ShelterScreen(),
+                ),
+              );
+                
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.notifications, color: Colors.red[900]),
+              title: Text(
+                'Alertas',
+                style: TextStyle(
+                  color: Colors.red[900],
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onTap: () {
+                Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => AlertScreen(),
+                ),
+              );
+                
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.flash_on, color: Colors.red[900]),
+              title: Text(
+                'Tipos de desastres',
+                style: TextStyle(
+                  color: Colors.red[900],
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onTap: () {
+                Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => TypeDisasterScreen(),
+                ),
+              );
+                
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.view_list, color: Colors.red[900]),
+              title: Text(
+                'Suministros',
+                style: TextStyle(
+                  color: Colors.red[900],
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onTap: () {
+                Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => SupplyListScreen(),
+                ),
+              );
+                
               },
             ),
             ListTile(
@@ -136,8 +352,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               onTap: () {
-                // Acción para configuración
                 Navigator.pop(context);
+                mostrarAlerta("En proceso...");
               },
             ),
             Divider(),
@@ -151,8 +367,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               onTap: () {
-                // Acción para "Acerca de"
                 Navigator.pop(context);
+                mostrarAlerta("En proceso...");
               },
             ),
             ListTile(
@@ -164,7 +380,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              onTap: irALogin,
+              onTap: mostrarConfirmacionCerrarSesion,
             ),
           ],
         ),
@@ -175,7 +391,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 class SectionCard extends StatelessWidget {
   final String title;
-  final String data;
+  final dynamic data;
 
   SectionCard({required this.title, required this.data});
 
@@ -198,15 +414,23 @@ class SectionCard extends StatelessWidget {
               ),
             ),
             SizedBox(height: 10),
-            Text(
-              data,
-              style: TextStyle(
-                color: Colors.white,
-              ),
-            ),
+            _buildDataWidget(data), // Usa una función auxiliar para construir el widget
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildDataWidget(dynamic data) {
+    if (data is String) {
+      return Text(
+        data,
+        style: TextStyle(color: Colors.white),
+      );
+    } else if (data is Widget) {
+      return data;
+    } else {
+      return SizedBox.shrink(); // Devuelve un widget vacío si no es String ni Widget
+    }
   }
 }

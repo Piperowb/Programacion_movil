@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'screens/login_screen.dart';
 import 'screens/registration_screen.dart';
 import 'screens/home_screen.dart';
-import 'screens/calculadora.dart';
+import 'screens/type_disaster.dart';
+import 'screens/alerts.dart';
+import 'screens/shelter.dart';
+import 'screens/supply_list.dart';
 
 void main() {
   runApp(MyApp());
@@ -17,7 +20,10 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginScreen(),
         '/registration': (context) => RegistrationScreen(),
         '/home': (context) => HomeScreen(),
-        '/calculadora': (context) => CalculadoraApp(),
+        '/alerts': (context) => AlertScreen(),
+        '/shelter': (context) => ShelterScreen(),
+        '/typeDisaster': (context) => TypeDisasterScreen(),
+        '/supplyList': (context) => SupplyListScreen(),
       },
     );
   }

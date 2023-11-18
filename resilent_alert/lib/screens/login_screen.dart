@@ -27,7 +27,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController contrasenaController = TextEditingController();
 
   Future<void> enviarSolicitudPost() async {
-    final url = Uri.parse('http://192.168.1.3/webService/consultarUsuario.php'); // Reemplaza con la URL correcta
+    final url = Uri.parse('http://192.168.1.3/webService/consultarUsuario.php'); 
 
     final response = await http.post(
       url,
@@ -39,14 +39,21 @@ class _MyHomePageState extends State<MyHomePage> {
     
     if (response.statusCode == 200) {
       var responseData = response.body;
-  
-      if (responseData == 'array(0) {}') {
+
+      if (int.tryParse(responseData) == 0) {
         mostrarAlerta("Los datos ingresados no son válidos, inténtalo nuevamente");
       } else {
         mostrarAlerta("Inicio de sesión exitoso");
         limpiarCampos();
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen()));
+
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => HomeScreen(),
+          ),
+        );
       }
+
+
     } else {
       print('Error: ${response.statusCode}');
       print('Mensaje de error: ${response.body}');
@@ -55,24 +62,30 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void mostrarAlerta(String mensaje) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Resultado'),
-          content: Text(mensaje),
-          actions: <Widget>[
-            TextButton(
-              child: Text('OK'),
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Resultado', style: TextStyle(fontWeight: FontWeight.bold)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(mensaje, style: TextStyle(fontSize: 16)),
+            SizedBox(height: 16),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(primary: Colors.red[900]),
               onPressed: () {
                 Navigator.of(context).pop();
               },
+              child: Text('OK', style: TextStyle(color: Colors.white)),
             ),
           ],
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
+
 
   void limpiarCampos() {
     correoController.clear();

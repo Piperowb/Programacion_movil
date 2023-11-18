@@ -8,16 +8,18 @@ class EjemploPost {
         
     }
 
-    function consultarUsuario() {
+    function agregarRefugios() {
         try {
             // Comprobar si la solicitud es POST
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Obtener los datos enviados en la solicitud POST
-                $correo = $_POST['correo'];
-                $contraseña = $_POST['contraseña'];
+                $nombre = $_POST['nombre'];
+                $ubicacion = $_POST['ubicacion'];
+                $capacidad = $_POST['capacidad'];
+                $servicios = $_POST['servicios'];
                 
                 $crud = new crud();
-                $sql = "SELECT * FROM usuario WHERE correo = '$correo' AND contraseña = '$contraseña'";
+                $sql = "INSERT INTO refugio (nombre, ubicacion, capacidad, servicios) VALUES ('$nombre', '$ubicacion', $capacidad, '$servicios');";
                 
                 $response = $crud ->consultar($sql);
                 
@@ -50,4 +52,4 @@ class EjemploPost {
 $ejemploPost = new EjemploPost();
 
 // Llamar a la función 'insertarUsuario' para manejar la solicitud POST
-$ejemploPost->consultarUsuario();
+$ejemploPost->agregarRefugios();
